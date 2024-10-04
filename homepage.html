@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROBO CHALLENGE</title>
+    <style>
+        body {
+            font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 50px;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffecec;
+          
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+        }
+
+        p {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3177c3;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #78b3f4;
+        }
+
+        #tradeReport {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #eaeff4;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the TRADING BOT</h1>
+        <p>This bot executes trades based on predefined rules and conditions , while tracking its profit loss or performance metrics.</p>
+
+        <div class="info">
+            <h2>TRADING INFO</h2>
+            <p>We buy stock when it drops by 2% and sell when it rises by 3%. Every 5 seconds, the bot fetches the latest stock price from Alpha Vantage .
+                We have kept the balance to be 10000. So it buys as many shares possible from that given balance</p>
+            <button id="viewTradeReports" class="button">View Trade Reports</button>
+        </div>
+    </div>
+
+    <div id="tradeReport"></div>
+
+    <script>
+        document.getElementById('viewTradeReports').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/report');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                document.getElementById('tradeReport').innerHTML = `
+                    <h2>Trade Report</h2>
+                    <p>Balance: ${data.balance}</p>
+                    <p>Position: ${data.position}</p>
+                    <h3>Trade History</h3>
+                    <ul>
+                        ${data.tradeHistory.map(trade => `
+                            <li>${trade.action} ${trade.shares} shares of ${trade.symbol} at ${trade.price} on ${trade.timestamp}</li>
+                        `).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                console.error('Error fetching trade report:', error);
+                document.getElementById('tradeReport').innerText = 'Failed to load trade report.';
+            }
+        });
+    </script>
+</body>
+</html>
